@@ -10,9 +10,21 @@
       <div class="row">
         <div class="col-6">
           <div v-if="post.creatorId == account.id">
-            <button @click="editPost">
-              Edit
-            </button>
+            <div class="row create-form">
+              <form @submit.prevent="editPost" class="form-inline">
+                <div class="form-group">
+                  <label for="post-Url" class="sr-only">Post URL</label>
+                  <input type="url" class="form-control" v-model="state.editedPost.imgUrl" placeholder="Post URL">
+                </div>
+                <div class="form-group">
+                  <label for="post-body" class="sr-only">Post Body</label>
+                  <input type="text" class="form-control" v-model="state.editedPost.body" placeholder="Post Body">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  Edit
+                </button>
+              </form>
+            </div>
             <button @click="deletePost">
               Delete
             </button>
@@ -36,26 +48,27 @@
 import { computed, reactive } from '@vue/runtime-core'
 import { AppState } from '../AppState'
 import { postsService } from '../services/PostsService'
-import { profileService } from '../services/ProfileService'
+import Notification from '../utils/Notification'
 
 export default {
   props: { post: { type: Object, required: true } },
   setup(props) {
     const state = reactive({
+      editedPost: {}
     })
     return {
       state,
       account: computed(() => AppState.account),
       async editPost() {
-        postsService.editPost()
+        postsService.editPost(props.post.id, state.editedPost)
       },
 
       async deletePost() {
-        postsService.deletePost(props.post.id)
-      },
-
-      setProfile() {
-        profileService.setProfile(props.post.creatorId)
+        if (confirm('Do you really want to delete your awesome post??')) {
+          postsService.deletePost(props.post.id)
+          postsService.getPosts()
+          Notification.toast('you deleted a post')
+        }
       }
     }
   }

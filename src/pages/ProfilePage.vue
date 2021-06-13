@@ -8,20 +8,29 @@
 </template>
 
 <script>
-import { watchEffect } from '@vue/runtime-core'
+import { computed, watchEffect } from '@vue/runtime-core'
 import { useRoute } from 'vue-router'
 import { profileService } from '../services/ProfileService'
+import { AppState } from '../AppState'
+import Notification from '../utils/Notification'
+import { router } from '../router'
 export default {
   name: 'ProfilePage',
   setup() {
     const route = useRoute()
 
-    watchEffect(() => {
-      profileService.setProfile(route.params.id)
+    watchEffect(async() => {
+      try {
+        await profileService.getProfileById(route.params.id)
+      } catch (error) {
+        Notification.toast('there is no profile')
+        router.push({ name: 'Home' })
+      }
     })
-    return {}
-  },
-  components: {}
+    return {
+      profile: computed(() => AppState.activeProfile)
+    }
+  }
 }
 </script>
 

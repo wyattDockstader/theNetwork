@@ -10,8 +10,8 @@
         Search
       </button>
     </form>
-  </div><!-- </router-link> -->
-  <div class="row create-form" v-if="AppState">
+  </div>
+  <div class="row create-form" v-if="user.isAuthenticated">
     <form @submit.prevent="createPost" class="form-inline">
       <div class="form-group">
         <label for="post-Url" class="sr-only">Post URL</label>
@@ -65,6 +65,7 @@ export default {
     return {
       AppState,
       state,
+      user: computed(() => AppState.user),
       older: computed(() => AppState.older),
       newer: computed(() => AppState.newer),
       posts: computed(() => AppState.posts),
