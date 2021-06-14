@@ -6,6 +6,7 @@
     <div class="col-9">
       <header>
         <Navbar />
+        <Ad />
       </header>
       <main>
         <router-view />

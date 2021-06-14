@@ -1,6 +1,5 @@
 <template>
   <div class="row">
-    <!-- <router-link class="row search-bar" :to="{ name: 'Search' }"> -->
     <form @submit.prevent="searchPost" class="form-inline">
       <div class="form-group">
         <label for="search" class="sr-only">Search Posts</label>
@@ -11,7 +10,7 @@
       </button>
     </form>
   </div>
-  <div class="row create-form" v-if="user.isAuthenticated">
+  <div class="row create-form" v-if="user.isAuthenticated && !activeProfile">
     <form @submit.prevent="createPost" class="form-inline">
       <div class="form-group">
         <label for="post-Url" class="sr-only">Post URL</label>
@@ -38,7 +37,7 @@
     <button @click="pageNewer" :disabled="!newer">
       Prev
     </button>
-    <button @click="pageOlder" :disabled="!older">
+    <button v-if="AppState.posts.length == 20" @click="pageOlder" :disabled="!older">
       Next
     </button>
   </div>
@@ -47,20 +46,14 @@
 <script>
 import { postsService } from '../services/PostsService'
 import { AppState } from '../AppState'
-import { computed, onMounted, reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import Notification from '../utils/Notification'
+import { router } from '../router'
 export default {
   setup() {
     const state = reactive({
       newPost: {},
       search: ''
-    })
-    onMounted(async() => {
-      try {
-        postsService.getPosts()
-      } catch (error) {
-        Notification.toast(error, 'you messed up')
-      }
     })
     return {
       AppState,
@@ -69,6 +62,7 @@ export default {
       older: computed(() => AppState.older),
       newer: computed(() => AppState.newer),
       posts: computed(() => AppState.posts),
+      activeProfile: computed(() => AppState.activeProfile),
       async pageOlder() {
         postsService.pageOlder()
       },
@@ -83,9 +77,10 @@ export default {
           Notification.toast(error, "couldn't create post homie")
         } state.newPost = {}
       },
-      async searchPost(formData) {
+      async searchPost() {
         try {
           await postsService.searchPost(state.search)
+          router.push({ name: 'Search' })
         } catch (error) {
           Notification.toast(error, "couldn't search posts homie")
         } state.search = ''

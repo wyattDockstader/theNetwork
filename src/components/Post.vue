@@ -1,6 +1,6 @@
 <template>
   <div class="post">
-    <div class="card" style="width: 18rem;">
+    <div class="card m-5 p-2" style="width: 18rem;">
       <img class="card-img-top" :src="post.imgUrl" alt="Card image cap">
       <div class="card-body">
         <p class="card-text">
@@ -37,7 +37,12 @@
           </div>
         </div>
         <div class="col-6">
+          <p>likes:{{ post.likes.length }}</p>
           <p>created at: {{ post.createdAt }}</p>
+          <div @change="changeLike" class="form-check">
+            <input type="checkbox" class="form-check-input" v-model="state.likedPost.likes">
+            <label class="form-check-label" for="exampleCheck1">Like</label>
+          </div>
         </div>
       </div>
     </div>
@@ -54,13 +59,18 @@ export default {
   props: { post: { type: Object, required: true } },
   setup(props) {
     const state = reactive({
-      editedPost: {}
+      editedPost: {},
+      likedPost: {}
     })
     return {
       state,
       account: computed(() => AppState.account),
       async editPost() {
         postsService.editPost(props.post.id, state.editedPost)
+      },
+
+      async changeLike() {
+        postsService.changeLike(props.post.id, state.likedPost)
       },
 
       async deletePost() {

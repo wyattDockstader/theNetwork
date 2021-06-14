@@ -1,6 +1,7 @@
 <template>
-  <div v-if="activeProfile" class="profilePage">
+  <div v-if="profile" class="profilePage">
     <Profile />
+    <Thread />
   </div>
   <div v-else>
     Loading ....
@@ -8,27 +9,31 @@
 </template>
 
 <script>
-import { computed, watchEffect } from '@vue/runtime-core'
+import { computed, reactive, watchEffect } from '@vue/runtime-core'
 import { useRoute } from 'vue-router'
 import { profileService } from '../services/ProfileService'
 import { AppState } from '../AppState'
-import Notification from '../utils/Notification'
 import { router } from '../router'
+import { logger } from '../utils/Logger'
 export default {
   name: 'ProfilePage',
   setup() {
     const route = useRoute()
-
+    const state = reactive({
+    })
     watchEffect(async() => {
       try {
         await profileService.getProfileById(route.params.id)
+        await profileService.getPostsByUserId(route.params.id)
       } catch (error) {
-        Notification.toast('there is no profile')
+        logger.log('there is no profile')
         router.push({ name: 'Home' })
       }
     })
     return {
-      profile: computed(() => AppState.activeProfile)
+      state,
+      profile: computed(() => AppState.activeProfile),
+      posts: computed(() => AppState.posts)
     }
   }
 }

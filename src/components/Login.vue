@@ -23,7 +23,7 @@
               Account
             </div>
           </router-link>
-          <router-link :to="{ name: 'Profile' }">
+          <router-link :to="{ name: 'Profile', params: { id: account.id } }">
             <div class="mx-3 hoverable">
               Profile
             </div>
@@ -45,15 +45,14 @@ import { reactive } from '@vue/reactivity'
 import { computed } from '@vue/runtime-core'
 import { AuthService } from '../services/AuthService'
 import { AppState } from '../AppState'
-import { logger } from '../utils/Logger'
 export default {
   setup() {
-    logger.log(AppState.user)
     const state = reactive({
       dropOpen: false
     })
     return {
       state,
+      account: computed(() => AppState.account),
       user: computed(() => AppState.user),
       async login() {
         AuthService.loginWithPopup()

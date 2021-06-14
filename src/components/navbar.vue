@@ -26,8 +26,8 @@
             Home
           </router-link>
         </li>
-        <li class="nav-item">
-          <router-link :to="{ name: 'Profile' }" class="nav-link text-dark">
+        <li v-if="user.isAuthenticated " class="nav-item">
+          <router-link :to="{ name: 'Profile', params: { id: account.id } }" class="nav-link text-dark">
             Profile
           </router-link>
         </li>
@@ -48,6 +48,7 @@ export default {
     })
     return {
       state,
+      account: computed(() => AppState.account),
       user: computed(() => AppState.user),
       async login() {
         AuthService.loginWithPopup()
